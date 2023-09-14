@@ -1,0 +1,19 @@
+bibentry(
+  bibtype = "Article",
+  textVersion = NULL,
+  header  = NULL,
+  mfooter = "This free open-source software implements academic research by the authors and co-workers. If you use it, please support the project by citing the appropriate journal article.",
+  title   = "Extending the Dynamic Range in Metabolomics Experiments by Automatic Correction of Peaks Exceeding the Detection Limit",
+  author  = c(
+              person("Jan", "Lisec"),
+              person("Friederike", "Hoffmann"),
+              person(c("Clemens", "A."), "Schmitt"),
+              person("Carsten", "Jaeger")
+            ),
+  year    = 2016,
+  journal = "Analytical Chemistry",
+  volume  = 88,
+  issue   = 15,
+  pages   = "7487--7492",
+  doi     = "10.1021/acs.analchem.6b02515"
+)
