@@ -12,6 +12,15 @@ VignetteBuilder: knitr
 Encoding: UTF-8
 Depends:
     R(>= 2.10.0)
-Imports:
-Suggests: bitops, digest, knitr, methods, rmarkdown, xcms, XML, xml2
+Suggests: 
+    bitops,
+    digest,
+    knitr,
+    methods,
+    rmarkdown,
+    spelling,
+    xcms,
+    XML,
+    xml2
 RoxygenNote: 7.2.3
+Language: en-US
