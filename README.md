@@ -5,17 +5,21 @@
 [![CRAN status](https://www.r-pkg.org/badges/version/CorrectOverloadedPeaks)](https://CRAN.R-project.org/package=CorrectOverloadedPeaks)
 <!-- badges: end -->
 
-Time series data are often analysed for peak signals. Mass spectrometry data may contain 
-flat top peaks due to technical limitations (i.e. detector saturation, DS). Flat top peaks 
-can also be termed 'overloaded' signals. Extracting the peak height to infer signal 
-intensity will obviously give wrong results for flat top peaks. However, using the peak 
-shape in the non-distorted fraction of the signal (intensity below DS), the true peak
-shape can be modeled mathematically. 
-This modelling is the core task of `CorrectOverloadedPeaks`. The R package accepts data in 
-xcmsRaw and mzXML format as input. Overloaded signals are detected automatically and modified 
-using an Gaussian or Isotopic-Ratio approach, QC plots are generated and corrected data are 
-stored within the original xcmsRaw or mzXML respectively to allow further processing.
-This way `CorrectOverloadedPeaks` can be incorporated in any metabolomics pipeline. Some
+Time series data are often analysed for peak signals. Mass spectrometry data may 
+contain flat top peaks due to technical limitations (i.e. detector saturation, DS). 
+Flat top peaks can also be termed 'overloaded' signals. Extracting the peak height 
+to infer signal intensity will obviously give wrong results for flat top peaks. 
+
+However, using the peak shape in the non-distorted fraction of the signal 
+(intensity below DS), the true peak shape can be modeled mathematically. 
+This modelling is the core task of **CorrectOverloadedPeaks**. 
+
+The R package accepts data in xcmsRaw and mzXML format as input. Overloaded signals 
+are detected automatically and modified using an Gaussian or Isotopic-Ratio approach, 
+QC plots are generated and corrected data are stored within the original xcmsRaw or 
+mzXML respectively to allow further processing.
+
+This way **CorrectOverloadedPeaks** can be incorporated in any metabolomics pipeline. Some
 utility functions are additionally exported, i.e. `read.mzData()` and `FitGaussPeak()`.
 
 ## Installation
@@ -27,9 +31,10 @@ You can install the development version of CorrectOverloadedPeaks from [GitHub](
 devtools::install_github("janlisec/CorrectOverloadedPeaks")
 ```
 
-or install from CRAN otherwise.
+or install from [CRAN](https://cran.r-project.org/package=CorrectOverloadedPeaks) 
+instead.
 
-## Example
+## Quick Example
 
 This is a basic example, modelling a flat topped peak first and restoring the true shape 
 assuming a Gaussian peak shape afterwards.
@@ -46,3 +51,9 @@ Next, we load some real life measurement data and correct the two overloaded pea
 data("mzXML_data", package = "CorrectOverloadedPeaks")
 tmp <- CorrectOverloadedPeaks::CorrectOverloadedPeaks(data=mzXML_data, method="EMG", testing=TRUE)
 ```
+
+## Detailed documentation
+
+You might either read the [Vignette](https://cran.r-project.org/package=CorrectOverloadedPeaks/vignettes/CorrectOverloadedPeaks.html) 
+describing the package functions in detail or read the [publication](https://doi.org/10.1021/acs.analchem.6b02515)
+which shows a evaluation of the performance of **CorrectOverloadedPeaks** on real data sets.
