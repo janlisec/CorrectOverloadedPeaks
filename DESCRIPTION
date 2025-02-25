@@ -13,11 +13,12 @@ VignetteBuilder: knitr
 Encoding: UTF-8
 Depends:
     R(>= 2.10.0)
+Imports:
+    methods
 Suggests: 
     bitops,
     digest,
     knitr,
-    methods,
     rmarkdown,
     spelling,
     xcms,

@@ -30,7 +30,9 @@ mzdata
 pre
 readBin
 sd
+spectrometry
 unparsed
 xcms
 xcmsRaw
+xcmsRawLike
 xlab

@@ -5,14 +5,14 @@
 [![CRAN status](https://www.r-pkg.org/badges/version/CorrectOverloadedPeaks)](https://CRAN.R-project.org/package=CorrectOverloadedPeaks)
 <!-- badges: end -->
 
-Time series data are often analysed for peak signals. Mass spectrometry data may 
+Time series data are often analyzed for peak signals. Mass spectrometry data may 
 contain flat top peaks due to technical limitations (i.e. detector saturation, DS). 
 Flat top peaks can also be termed 'overloaded' signals. Extracting the peak height 
 to infer signal intensity will obviously give wrong results for flat top peaks. 
 
 However, using the peak shape in the non-distorted fraction of the signal 
 (intensity below DS), the true peak shape can be modeled mathematically. 
-This modelling is the core task of **CorrectOverloadedPeaks**. 
+This modeling is the core task of **CorrectOverloadedPeaks**. 
 
 The R package accepts data in xcmsRaw and mzXML format as input. Overloaded signals 
 are detected automatically and modified using an Gaussian or Isotopic-Ratio approach, 
@@ -36,7 +36,7 @@ instead.
 
 ## Quick Example
 
-This is a basic example, modelling a flat topped peak first and restoring the true shape 
+This is a basic example, modeling a flat topped peak first and restoring the true shape 
 assuming a Gaussian peak shape afterwards.
 
 ``` r
