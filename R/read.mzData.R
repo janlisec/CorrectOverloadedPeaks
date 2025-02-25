@@ -133,17 +133,6 @@ read.mzData <- function(filename, fmt = c("xcmsRaw", "xcmsRawLike"), verbose = F
 
   if (fmt == "xcmsRaw") { out <- xcms::deepCopy(methods::new("xcmsRaw")) }
   if (fmt == "xcmsRawLike") { 
-    setClass("xcmsRawLike", representation(
-      env = "environment",
-      tic = "numeric",
-      scantime = "numeric",
-      scanindex = "integer",
-      polarity = "factor",
-      acquisitionNum = "integer",
-      mzrange = "numeric",
-      scanrange = "numeric",
-      filepath = "character"
-    ))
     out <- methods::new("xcmsRawLike")
   }
   
@@ -160,8 +149,23 @@ read.mzData <- function(filename, fmt = c("xcmsRaw", "xcmsRawLike"), verbose = F
     out@filepath <- xcms::xcmsSource(filename)
   }
   if (fmt == "xcmsRawLike") {
-    out@filepath <- filename
+    out@filepath <- basename(filename)
   }
   
   return(out)
 }
+
+#' @title S4 class xcmsRawLike.
+#' @exportClass xcmsRawLike
+#' @rdname read.mzData
+setClass("xcmsRawLike", representation(
+  env = "environment",
+  tic = "numeric",
+  scantime = "numeric",
+  scanindex = "integer",
+  polarity = "factor",
+  acquisitionNum = "integer",
+  mzrange = "numeric",
+  scanrange = "numeric",
+  filepath = "character"
+))
