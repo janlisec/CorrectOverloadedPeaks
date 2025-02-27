@@ -45,6 +45,9 @@ The main task of read.mzData functions is to import mzData files to R.
   identical(x@env$mz, x2@env$mz)
   identical(x@scanindex, x2@scanindex)
   file.remove(c('test.mzData', 'test.mzXML'))
+  
+  # check that objects are independent (not identical)
+  identical(methods::new("xcmsRawLike"), methods::new("xcmsRawLike"))
 } 
 
 }

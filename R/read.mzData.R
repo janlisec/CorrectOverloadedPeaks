@@ -36,7 +36,7 @@
 #'   file.remove(c('test.mzData', 'test.mzXML'))
 #'   
 #'   # check that objects are independent (not identical)
-#'   identical(methods::new("xcmsRawLike"), methods::new("xcmsRawLike"))
+#'   !identical(methods::new("xcmsRawLike"), methods::new("xcmsRawLike"))
 #' } 
 #'
 #' @export

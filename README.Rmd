@@ -1,0 +1,87 @@
+---
+output: github_document
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-"#,
+  #out.width = "100%"
+)
+```
+
+# CorrectOverloadedPeaks
+
+<!-- badges: start -->
+[![CRAN status](https://www.r-pkg.org/badges/version/CorrectOverloadedPeaks)](https://CRAN.R-project.org/package=CorrectOverloadedPeaks)
+[![Static Badge](https://img.shields.io/badge/doi-10.1021/acs.analchem.6b02515-yellow.svg)](https://doi.org/10.1021/acs.analchem.6b02515)
+<!-- badges: end -->
+
+Time series data are often analyzed for peak signals. Mass spectrometry data may 
+contain flat top peaks due to technical limitations (i.e. detector saturation, DS). 
+Flat top peaks can also be termed 'overloaded' signals. Extracting the peak height 
+to infer signal intensity will obviously give wrong results for flat top peaks. 
+
+However, using the peak shape in the non-distorted fraction of the signal 
+(intensity below DS), the true peak shape can be modeled mathematically. 
+This modeling is the core task of **CorrectOverloadedPeaks**. 
+
+The R package accepts data in xcmsRaw and mzXML format as input. Overloaded signals 
+are detected automatically and modified using an Gaussian or Isotopic-Ratio approach, 
+QC plots are generated and corrected data are stored within the original xcmsRaw or 
+mzXML respectively to allow further processing.
+
+This way **CorrectOverloadedPeaks** can be incorporated in any metabolomics pipeline. Some
+utility functions are additionally exported, i.e. `read.mzData()` and `FitGaussPeak()`.
+
+## Installation
+
+You can install the development version of CorrectOverloadedPeaks from [GitHub](https://github.com/) with:
+
+```{r install, eval=FALSE}
+# install.packages("devtools")
+devtools::install_github("janlisec/CorrectOverloadedPeaks")
+```
+
+or install from [CRAN](https://cran.r-project.org/package=CorrectOverloadedPeaks) 
+instead.
+
+## Quick Example
+
+This is a basic example, modeling a flat topped peak first and restoring the true shape 
+assuming a Gaussian peak shape afterwards.
+
+```{r artificial_peak}
+# model and a gauss shaped peak with flat top
+pk <- CorrectOverloadedPeaks::ModelGaussPeak(height=10^7, width=3, scan_rate=10, e=0, ds=8*10^6, base_line=10^2)
+head(pk)
+plot(pk, main="Gaussian peak of true intensity 10^7 but cutt off at 8*10^6")
+
+# identify the peak range and estimate the correct intensities
+idx <- pk[,"int"]>0.005 * max(pk[,"int"])
+tmp <- CorrectOverloadedPeaks::FitGaussPeak(x=pk[idx,"rt"], y=pk[idx,"int"], silent=FALSE, xlab="RT", ylab="Intensity")
+cbind(pk[idx,], tmp)
+```
+Next, we load some real life measurement data and correct the two overloaded peaks contained.
+
+```{r real_eaxample}
+x <- CorrectOverloadedPeaks::mzXML_data
+
+# identify the maximum intensity values per scan
+bpc <- sapply(x[[5]], function(y) { max(y$peaks) })
+plot(bpc)
+
+# correct the overloaded data
+x_corr <- CorrectOverloadedPeaks::CorrectOverloadedPeaks(data = x, method = "EMG")
+bpc <- sapply(x_corr[[5]], function(y) { max(y$peaks) })
+plot(bpc)
+```
+
+## Detailed documentation
+
+You might either read the [Vignette](https://cran.r-project.org/package=CorrectOverloadedPeaks/vignettes/CorrectOverloadedPeaks.html) 
+describing the package functions in detail or read the [publication](https://doi.org/10.1021/acs.analchem.6b02515)
+which shows a evaluation of the performance of **CorrectOverloadedPeaks** on real data sets.

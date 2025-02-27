@@ -144,7 +144,7 @@ function(x, y, scale_range=c(1,10), steps=10, cutoff=0.95, idx=NULL, weight_fron
       
       #print(test)
       if (!silent) {
-        print(paste0("Number of converging sollutions: ", sum(test_c), ", keeping ", length(test)))
+        message(paste0("Number of converging sollutions: ", sum(test_c), ", keeping ", length(test)))
         if (method=="EMG") test_plot <- sapply(test, function(z) {p <- z$par; return(baseline_offset + p[3]*demg(x_original, mean=p[1], sd=p[2], l=p[4]))})
         if (method=="Gauss") test_plot <- sapply(test, function(z) {p <- z$par; return(baseline_offset + p[3]*dnorm(x_original, mean=p[1], sd=p[2]))})
         test_cols <- test_v[flt]/max(test_v[flt])

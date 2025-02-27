@@ -18,6 +18,9 @@
 #'     be working for a Bruker impact II MS (high-res QTOF) coupled to GC and LC via 
 #'     APCI and ESI respectively. For more details please 
 #'     see \doi{10.1021/acs.analchem.6b02515}.
+#'     Note! If you find that standard parameters are not working well, you can 
+#'     test a different set for individual peaks using parameters `region` and 
+#'     `peak`.
 #'
 #' @references \doi{10.1021/acs.analchem.6b02515}
 #'
@@ -26,7 +29,7 @@
 #' @param detection_limit If=1 only peaks hitting detector saturation (ds) will be corrected, can be lowered to 0.95 to catch also peaks going into saturation.
 #' @param ds Detector saturation. Will be determined based on data if not specified explicitly.
 #' @param silent QC-plots will be generated if silent=FALSE and additional Warnings() will be generated.
-#' @param testing Will automatically set silent=FALSE and store all extracted regions with overloaded peaks in the working directory as \code{cor_df_all.RData}.
+#' @param testing Will automatically set silent=FALSE and store all extracted regions with overloaded peaks in the temp directory as \code{cor_df_all.RData}.
 #' @param attotwm All-the-Time-of-the-World-Mode. If calculation time doesn't matter try this out. :)
 #' @param region From an initial QC-Plot file you may reprocess a specific overloaded region. Don't forget to specify the ds parameter explicitly.
 #' @param peak You may further restrict the reprocessing to a specific peak within the region.
@@ -37,8 +40,17 @@
 #' @examples
 #' \dontrun{
 #'   # load mzXML test data
-#'   data(mzXML_data)
-#'   CorrectOverloadedPeaks(data = mzXML_data, method = "EMG", silent = FALSE)
+#'   x <- CorrectOverloadedPeaks::mzXML_data
+#'   
+#'   # identify the maximum intensity value
+#'   bpc <- sapply(x[[5]], function(y) { max(y$peaks) })
+#'   plot(bpc)
+#'   ds <- max(bpc)
+#'   
+#'   # calling the function with silent = FALSE would generate a QC plot file in the working directory
+#'   x_corr <- CorrectOverloadedPeaks(data = x, method = "EMG", silent = TRUE)
+#'   bpc <- sapply(x_corr[[5]], function(y) { max(y$peaks) })
+#'   plot(bpc)
 #' }
 #'
 #' @seealso \code{\link{ModelGaussPeak}}
@@ -228,18 +240,18 @@ CorrectOverloadedPeaks <- function(
   # determine value of detector saturation (if not specified explicitly) and presence of overloaded peaks
   ds <- DetermineDetectorSaturation(ds = ds, pks = pks, inf = inf)
 
-  if (!silent) cat(paste("\nProcessing...", file_in, "\n"))
+  if (!silent) message(paste("\nProcessing...", file_in, "\n"))
 
   # apply correction if overloaded peaks are present
   if (!attr(ds, "opp")) {
-    if (!silent) print("Found no overloaded peaks in sample. Return data as is.")
+    if (!silent) message("Found no overloaded peaks in sample. Return data as is.")
   } else {
     # file name for plot output
     if (!silent) grDevices::pdf(ifelse(file_in == "", paste0(format(Sys.time(), "%Y-%m-%d_%H%M%S"), "_CorrectOverloadedPeaks_ControlPlot.pdf"), paste0(file_in, ".pdf")))
 
     # search rt-regions and masses above detector saturation
     mzovld <- GetOverloadedRegions(inf = inf, pks = pks, lim = detection_limit * ds, allowed_scans_missing = allowed_scans_missing, mz_gap_allowed = mz_gap_allowed)
-    if (!silent) cat(paste("\nTrying to correct", length(mzovld), "overloaded regions.\n"))
+    if (!silent) message(paste("\nTrying to correct", length(mzovld), "overloaded regions.\n"))
 
     # write all extracted raw data into list for individual file for testing purposes
     if (testing) {
@@ -326,13 +338,13 @@ CorrectOverloadedPeaks <- function(
         if (err_code > 0) {
           tmp.rt <- round(mean(cor_df[idx, "RT"]), 2)
           tmp.mz <- round(mean(cor_df[idx, "mz0"]), 4)
-          if (err_code == 1) print(paste("Did not correct a peak with overloading wider than", limit_of_correction, "at RT =", tmp.rt, "for mz =", tmp.mz))
-          if (err_code == 2) print(paste("Did not correct a peak without detectable front at RT =", tmp.rt, "for mz =", tmp.mz))
-          if (err_code == 3) print(paste("Did not correct a peak without detectable tail at RT =", tmp.rt, "for mz =", tmp.mz))
-          if (err_code == 9) print("Skip peak because 'region' and/or 'peak' are specified.")
+          if (err_code == 1) message(paste("Did not correct a peak with overloading wider than", limit_of_correction, "at RT =", tmp.rt, "for mz =", tmp.mz))
+          if (err_code == 2) message(paste("Did not correct a peak without detectable front at RT =", tmp.rt, "for mz =", tmp.mz))
+          if (err_code == 3) message(paste("Did not correct a peak without detectable tail at RT =", tmp.rt, "for mz =", tmp.mz))
+          if (err_code == 9) message("Skip peak because 'region' and/or 'peak' are specified.")
         } else {
           # browser()
-          if (!silent) print(paste("Processing Region/Mass:", paste(i, "/", k)))
+          if (!silent) message(paste("Processing Region/Mass:", paste(i, "/", k)))
 
           # calculate IsotopicRatioFit as basis or final, correct only M0 intensity because M+1 will be corrected independently if overloaded
           cor_df_mod <- cor_df
@@ -410,8 +422,10 @@ CorrectOverloadedPeaks <- function(
 
     # assign to base
     if (testing) {
-      print("Storing non-corrected data information in 'cor_df_all.RData'")
-      save(cor_df_all, file = "cor_df_all.RData")
+      tmp_fl <- tempfile()
+      tmp_fl <- gsub(basename(tmp_fl), "cor_df_all.RData", tmp_fl)
+      message("Storing non-corrected data information in ", tmp_fl)
+      save(cor_df_all, file = tmp_fl)
     }
 
     # put corrected data back into file
@@ -423,9 +437,9 @@ CorrectOverloadedPeaks <- function(
     }
     if (inherits(data, "mzXML")) {
       # for (i in 1:length(pks)) data[["scan"]][[i]][["mass"]]  <- pks[[i]][,1]
-      # print(table(sapply(1:length(pks), function(i) {all(data[["scan"]][[i]][["peaks"]]==round(pks[[i]][,2]))})))
+      # message(table(sapply(1:length(pks), function(i) {all(data[["scan"]][[i]][["peaks"]]==round(pks[[i]][,2]))})))
       for (i in 1:length(pks)) data[["scan"]][[i]][["peaks"]] <- round(pks[[i]][, 2])
-      # print(table(sapply(1:length(pks), function(i) {all(data[["scan"]][[i]][["peaks"]]==round(pks[[i]][,2]))})))
+      # message(table(sapply(1:length(pks), function(i) {all(data[["scan"]][[i]][["peaks"]]==round(pks[[i]][,2]))})))
     }
   }
   invisible(data)
